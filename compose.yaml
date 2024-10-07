@@ -2,10 +2,17 @@ version: '3.8'
 
 services:
   app:
-    image: .
+    build: .
+    ports:
+      - "8080:8080"
     depends_on:
       - oracle
-      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle:1521:xe
+      SPRING_DATASOURCE_USERNAME: user_oracle
+      SPRING_DATASOURCE_PASSWORD: pass_oracle
+    volumes:
+      - ./target:/app
 
   oracle:
     image: 'gvenzl/oracle-free:latest'
@@ -15,12 +22,3 @@ services:
       APP_USER_PASSWORD: pass_oracle
     ports:
       - '1521:1521'
-
-  postgres:
-    image: 'postgres:latest'
-    environment:
-      POSTGRES_DB: psql_security
-      POSTGRES_PASSWORD: secret
-      POSTGRES_USER: user
-    ports:
-      - '5432:5432'
