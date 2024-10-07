@@ -48,7 +48,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id)
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o ID: " + id)); // 404 (ResourceNotFoundException)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o ID: " + id));
         return ResponseEntity.ok(user);
     }
 
