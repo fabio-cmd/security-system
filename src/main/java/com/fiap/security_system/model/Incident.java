@@ -10,8 +10,8 @@ public class Incident {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name= "user_id")
-    private User responsible;
+    @JoinColumn(name= "employee_id")
+    private Employee responsible;
 
     private String title;
 
@@ -33,11 +33,11 @@ public class Incident {
         this.status = status;
     }
 
-    public User getResponsible() {
+    public Employee getResponsible() {
         return responsible;
     }
 
-    public void setResponsible(User responsible) {
+    public void setResponsible(Employee responsible) {
         this.responsible = responsible;
     }
 

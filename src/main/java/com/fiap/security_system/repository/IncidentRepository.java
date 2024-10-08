@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByStatus(STATUS status);
-    List<Incident> findByResponsible(User user);
+    List<Incident> findByResponsible(Employee employee);
 }

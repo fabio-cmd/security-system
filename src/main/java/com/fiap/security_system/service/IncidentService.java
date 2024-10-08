@@ -37,7 +37,7 @@ public class IncidentService {
         return incidentRepository.findByStatus(status);
     }
 
-    public List<Incident> getIncidentsByResponsible(User user) {
-        return incidentRepository.findByResponsible(user);
+    public List<Incident> getIncidentsByResponsible(Employee employee) {
+        return incidentRepository.findByResponsible(employee);
     }
 }

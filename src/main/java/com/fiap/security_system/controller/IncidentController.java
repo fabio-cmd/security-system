@@ -51,8 +51,8 @@ public class IncidentController {
     }
 
     @GetMapping("/responsible")
-    public ResponseEntity<List<Incident>> getIncidentsByResponsible(@RequestBody User user) {
-        List<Incident> incidents = incidentService.getIncidentsByResponsible(user);
+    public ResponseEntity<List<Incident>> getIncidentsByResponsible(@RequestBody Employee employee) {
+        List<Incident> incidents = incidentService.getIncidentsByResponsible(employee);
         return ResponseEntity.ok(incidents);
     }
 

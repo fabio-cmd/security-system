@@ -3,7 +3,6 @@ package com.fiap.security_system.auth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -12,8 +11,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private static final String secret = "SUPER-SECRET";
 
     public String generateToken(String username) {
         return Jwts.builder().setSubject(username)
