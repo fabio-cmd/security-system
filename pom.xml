@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<flyway.cleanDisabled>false</flyway.cleanDisabled>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -62,12 +63,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-docker-compose</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
@@ -123,6 +118,19 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-maven-plugin</artifactId>
+			<version>10.10.0</version>
+			<configuration>
+				<url>jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl</url>
+				<user>rm552849</user>
+				<password>050303</password>
+				<locations>
+					<location>classpath:db/migration</location>
+				</locations>
+			</configuration>
+		</plugin>
 		</plugins>
 	</build>
 
