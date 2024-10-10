@@ -31,16 +31,13 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/auth/register").permitAll()
-                                .requestMatchers("/api/auth/logout").permitAll()
-                                .requestMatchers("/api/auth/login").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/incidents/**").hasAnyRole("ADMIN", "POLICE_OFFICER")
-                                .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ADMIN", "POLICE_OFFICER")
+                                .requestMatchers(HttpMethod.GET, "/api/incidents/**").hasAnyRole("ADMIN", "POLICE_OFFICER")
                                 .requestMatchers(HttpMethod.PATCH, "/api/incidents/**").hasAnyRole("ADMIN", "POLICE_OFFICER")
-                                .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.PATCH, "/api/**").hasAnyRole("ADMIN", "POLICE_OFFICER")
-                                .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/api/employees/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/api/incidents").hasAnyRole("ADMIN", "POLICE_OFFICER")
+                                .requestMatchers(HttpMethod.DELETE, "/api/employees").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/incidents").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -48,6 +45,8 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
