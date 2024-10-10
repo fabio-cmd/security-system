@@ -9,6 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -25,30 +29,37 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody UserDTO userDTO) {
         User user = userService.findByUsername(userDTO.username());
 
         if (user == null || !passwordEncoder.matches(userDTO.password(), user.getPassword())) {
-            return ResponseEntity.status(401).body("Invalid username or password");
+            return ResponseEntity.status(401).body(Collections.singletonMap("error", "username ou senha inválidos"));
         }
 
-        String token = jwtService.generateToken(user.getUsername());
-        return ResponseEntity.ok(token);
+        String token = jwtService.generateToken(user.getUsername(), List.of(user.getRole().name()));
+        return ResponseEntity.ok(Collections.singletonMap("token", token));
     }
 
+
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody UserDTO userDTO) {
         if (userService.findByUsername(userDTO.username()) != null) {
-            return ResponseEntity.status(400).body("User already exists");
+            return ResponseEntity.status(400).body(Collections.singletonMap("error", "usuario ja existe"));
+        }
+        if (userDTO.role() == null) {
+            return ResponseEntity.status(401).body(Collections.singletonMap("error", "informe a role do usuario"));
         }
 
         User newUser = new User();
         newUser.setUsername(userDTO.username());
         newUser.setPassword(passwordEncoder.encode(userDTO.password()));
+        newUser.setRole(userDTO.role());
         userService.saveUser(newUser);
 
-        String token = jwtService.generateToken(newUser.getUsername());
+        String token = jwtService.generateToken(newUser.getUsername(), List.of(newUser.getRole().name()));
 
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(Collections.singletonMap("token", token));
     }
+
+
 }

@@ -1,9 +1,12 @@
 package com.fiap.security_system.service;
 
+import com.fiap.security_system.model.ROLES;
 import com.fiap.security_system.model.User;
 import com.fiap.security_system.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -21,5 +24,6 @@ public class UserService {
 
     public void saveUser(User user) {
         userRepository.save(user);
+        System.out.println(user.getRole());
     }
 }

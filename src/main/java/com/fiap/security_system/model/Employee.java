@@ -10,22 +10,13 @@ public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Enumerated(EnumType.STRING)
-    private ROLES role;
-
     private String documentId;
 
     @OneToMany(mappedBy = "responsible", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Incident> incidents;
 
-    public ROLES getRole() {
-        return role;
-    }
-
-    public void setRole(ROLES role) {
-        this.role = role;
-    }
+    @Enumerated(EnumType.STRING)
+    private ROLES role;
 
     public String getDocumentId() {
         return documentId;

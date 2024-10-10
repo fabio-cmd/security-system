@@ -23,8 +23,8 @@ public class EmployeeController {
 
     @PostMapping
     public ResponseEntity<Employee> createUser(@RequestBody Employee employee) {
-        if (employee.getRole() == null) {
-            throw new BadRequestException("Informe a role do funcionario.");
+        if (employee.getDocumentId() == null) {
+            throw new BadRequestException("Informe a matricula do funcionario.");
         }
 
         Employee savedEmployee = employeeService.saveEmployee(employee);

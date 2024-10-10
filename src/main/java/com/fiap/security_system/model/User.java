@@ -12,6 +12,10 @@ public class User {
     private String username;
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private ROLES role;
+
+
     public String getUsername() {
         return username;
     }
@@ -26,5 +30,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public ROLES getRole() {
+        return role;
+    }
+
+    public void setRole(ROLES role) {
+        this.role = role;
     }
 }
