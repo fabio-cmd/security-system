@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  oracle-db-service:
+    container_name: oracle-db-service
+    ports:
+      - '9445:1521'
+    image: gvenzl/oracle-xe:latest
+    environment:
+      ORACLE_PASSWORD: password
+      APP_USER: test
+      APP_USER_PASSWORD: test
+    healthcheck:
+      test: [ "CMD-SHELL", "echo 'SELECT 1 FROM dual;' | sqlplus -s user/password@localhost:1521/ORCLCDB.localdomain" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
