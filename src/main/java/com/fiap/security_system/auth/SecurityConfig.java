@@ -1,11 +1,13 @@
 package com.fiap.security_system.auth;
 
 
+import com.fiap.security_system.service.CustomUserDetailsService;
 import com.fiap.security_system.service.EmployeeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,11 +20,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final EmployeeService employeeService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, EmployeeService employeeService) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomUserDetailsService customUserDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.employeeService = employeeService;
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
 
     @Bean
@@ -32,15 +42,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/incidents/**").hasAnyRole("ADMIN", "POLICE_OFFICER")
-                                .requestMatchers(HttpMethod.PATCH, "/api/incidents/**").hasAnyRole("ADMIN", "POLICE_OFFICER")
-                                .requestMatchers(HttpMethod.PATCH, "/api/employees/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.PATCH, "/api/incidents").hasAnyRole("ADMIN", "POLICE_OFFICER")
-                                .requestMatchers(HttpMethod.DELETE, "/api/employees").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/api/incidents").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/incidents/**").hasAnyAuthority("ADMIN", "POLICE_OFFICER")
+                                .requestMatchers(HttpMethod.PATCH, "/api/incidents/**").hasAnyAuthority("ADMIN", "POLICE_OFFICER")
+                                .requestMatchers(HttpMethod.PATCH, "/api/employees/**").hasAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/employees/**").hasAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/incidents/**").hasAuthority("ADMIN")
                                 .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
