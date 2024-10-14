@@ -1,5 +1,6 @@
 package com.fiap.security_system.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public class Employee {
     private String documentId;
 
     @OneToMany(mappedBy = "responsible", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Incident> incidents;
 
     @Enumerated(EnumType.STRING)
@@ -32,5 +34,13 @@ public class Employee {
 
     public void setIncidents(List<Incident> incidents) {
         this.incidents = incidents;
+    }
+
+    public ROLES getRole() {
+        return role;
+    }
+
+    public void setRole(ROLES role) {
+        this.role = role;
     }
 }

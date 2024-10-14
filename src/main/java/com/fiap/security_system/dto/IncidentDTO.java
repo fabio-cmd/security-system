@@ -7,5 +7,6 @@ public record IncidentDTO(
         CRIME_TYPE type,
         String description,
         String localization,
-        STATUS status
+        STATUS status,
+        long responsibleId
 ) {}

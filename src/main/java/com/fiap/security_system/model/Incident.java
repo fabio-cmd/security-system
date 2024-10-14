@@ -1,16 +1,18 @@
 package com.fiap.security_system.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name= "incidents")
+@Table(name = "incidents")
 public class Incident {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ManyToOne
-    @JoinColumn(name= "employee_id")
+    @JoinColumn(name = "employee_id", nullable = false)
+    @JsonBackReference
     private Employee responsible;
 
     private String title;
