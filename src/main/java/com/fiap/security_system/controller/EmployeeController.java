@@ -38,14 +38,14 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getUserById(@PathVariable Long id) {
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id)
                 .orElseThrow(() -> new NotFoundException("Funcionario não encontrado com o ID: " + id));
         return ResponseEntity.ok(employee);
     }
 
     @GetMapping("/role/{role}")
-    public ResponseEntity<List<Employee>> getUsersByRole(@PathVariable ROLES role) {
+    public ResponseEntity<List<Employee>> getEmployeesByRole(@PathVariable ROLES role) {
         List<Employee> employees = employeeService.getEmployeeByRole(role);
         return ResponseEntity.ok(employees);
     }

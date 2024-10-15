@@ -42,12 +42,12 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
         if (userService.findByUsername(userDTO.username()) != null) {
-            return ResponseEntity.status(400).body(Collections.singletonMap("error", "usuario ja existe"));
+            return ResponseEntity.status(400).body("usuario ja existe");
         }
         if (userDTO.role() == null) {
-            return ResponseEntity.status(401).body(Collections.singletonMap("error", "informe a role do usuario"));
+            return ResponseEntity.status(401).body("informe a role do usuario");
         }
 
         User newUser = new User();
@@ -56,9 +56,8 @@ public class AuthController {
         newUser.setRole(userDTO.role());
         userService.saveUser(newUser);
 
-        String token = jwtService.generateToken(newUser.getUsername(), List.of(newUser.getRole().name()));
 
-        return ResponseEntity.ok(Collections.singletonMap("token", token));
+        return ResponseEntity.ok("");
     }
 
 
