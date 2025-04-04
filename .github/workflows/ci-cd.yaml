@@ -24,6 +24,10 @@ jobs:
       - name: Build Maven
         run: mvn clean package
 
+      - name: Verificar arquivos em target
+        run: ls -la target
+
+
       - name: Executar testes
         run: mvn test
 
