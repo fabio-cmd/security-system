@@ -39,9 +39,8 @@ jobs:
 
       - name: Build da imagem Docker
         run: |
-          # Exemplo: gerar duas tags: latest e staging
-          docker build -t <seu_dockerhub>/security-system:latest .
-          docker tag <seu_dockerhub>/security-system:latest <seu_dockerhub>/security-system:staging
+          docker build -t fabiodinizdev/security-system:latest .
+          docker tag fabiodinizdev/security-system:latest fabiodinizdev/security-system:staging
 
       - name: Push da imagem
         run: |
