@@ -1,0 +1,48 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build Maven
+        run: mvn clean package
+
+      - name: Executar testes
+        run: mvn test
+
+  build_and_push_docker:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Login no Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build da imagem Docker
+        run: |
+          # Exemplo: gerar duas tags: latest e staging
+          docker build -t <seu_dockerhub>/security-system:latest .
+          docker tag <seu_dockerhub>/security-system:latest <seu_dockerhub>/security-system:staging
+
+      - name: Push da imagem
+        run: |
+          docker push fabiodinizdev/security-system:latest
