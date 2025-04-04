@@ -40,8 +40,9 @@ jobs:
           docker tag fabiodinizdev/security-system:latest fabiodinizdev/security-system:staging
 
       - name: Push da imagem
-        run: docker push fabiodinizdev/security-system:latest
-             docker push fabiodinizdev/security-system:staging
+        run: |
+          docker push fabiodinizdev/security-system:latest
+          docker push fabiodinizdev/security-system:staging
 
   deploy_staging:
     name: Deploy no ambiente de staging
