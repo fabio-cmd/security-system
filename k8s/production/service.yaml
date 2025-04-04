@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: security-system-prod-service
+spec:
+  selector:
+    app: security-system
+    env: production
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30081
+  type: NodePort
