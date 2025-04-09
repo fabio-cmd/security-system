@@ -1,40 +1,64 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: security-system-prod
+  name: security-system
+  namespace: production
   labels:
     app: security-system
-    env: production
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: security-system
-      env: production
   template:
     metadata:
       labels:
         app: security-system
-        env: production
     spec:
       containers:
-        - name: security-system-app
-          image: fabiodinizdev/security-system:latest
+        - name: app
+          image: fabiodinizdev/security-system:latest 
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:oracle:thin:@2804:4b0:1200:5d00:e5a3:ca39:6903:f1d:9445/XEPDB1
+              valueFrom:
+                configMapKeyRef:
+                  name: security-system-config
+                  key: SPRING_DATASOURCE_URL
+
+            - name: SPRING_CONFIG_LOCATION
+              value: /config/application.properties
+
             - name: SPRING_DATASOURCE_USERNAME
-              value: test
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-credentials
+                  key: ORACLE_USER
+
             - name: SPRING_DATASOURCE_PASSWORD
-              value: test
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-credentials
+                  key: ORACLE_PASSWORD
+
             - name: SPRING_DATASOURCE_DRIVERCLASSNAME
               value: oracle.jdbc.OracleDriver
+
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: true
+
           resources:
             requests:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: 300m
+              memory: 512Mi
             limits:
-              cpu: "1000m"
-              memory: "1024Mi"
+              cpu: 1
+              memory: 1Gi
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: security-system-config

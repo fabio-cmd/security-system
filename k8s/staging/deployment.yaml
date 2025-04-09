@@ -1,40 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: security-system-staging
+  name: security-system
+  namespace: staging
   labels:
     app: security-system
-    env: staging
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: security-system
-      env: staging
   template:
     metadata:
       labels:
         app: security-system
-        env: staging
     spec:
       containers:
-        - name: security-system-app
-          image: fabiodinizdev/security-system:staging
+        - name: app
+          image: fabiodinizdev/security-system:staging .
           ports:
             - containerPort: 8080
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "256Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:oracle:thin:@2804:4b0:1200:5d00:e5a3:ca39:6903:f1d:9445/XEPDB1
+              value: jdbc:oracle:thin:@oracle.staging.svc.cluster.local:1521/XEPDB1
             - name: SPRING_DATASOURCE_USERNAME
-              value: test
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-credentials
+                  key: ORACLE_USER
             - name: SPRING_DATASOURCE_PASSWORD
-              value: test
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-credentials
+                  key: ORACLE_PASSWORD
             - name: SPRING_DATASOURCE_DRIVERCLASSNAME
               value: oracle.jdbc.OracleDriver
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

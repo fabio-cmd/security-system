@@ -1,8 +1,6 @@
 package com.fiap.security_system.auth;
 
-
 import com.fiap.security_system.service.CustomUserDetailsService;
-import com.fiap.security_system.service.EmployeeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -41,22 +41,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
+                                .requestMatchers("/actuator/**").permitAll() // Permita todos os endpoints actuator
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/incidents/**").hasAnyAuthority("ADMIN", "POLICE_OFFICER")
-                                .requestMatchers(HttpMethod.PATCH, "/api/incidents/**").hasAnyAuthority("ADMIN", "POLICE_OFFICER")
-                                .requestMatchers(HttpMethod.PATCH, "/api/employees/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/api/employees/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/api/incidents/**").hasAuthority("ADMIN")
+                                // resto das regras...
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider());
-
+    
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

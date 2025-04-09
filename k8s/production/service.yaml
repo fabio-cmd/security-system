@@ -1,14 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: security-system-prod-service
+  name: security-system
+  namespace: production
 spec:
   selector:
     app: security-system
-    env: production
+  type: LoadBalancer
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 80
       targetPort: 8080
-      nodePort: 30081
-  type: NodePort
