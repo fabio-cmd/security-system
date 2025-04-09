@@ -52,14 +52,11 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Login no Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-      - name: Obter credenciais do AKS
-        run: az aks get-credentials --resource-group devops-rg --name security-cluster --overwrite-existing      
-
+      - name: Configurar kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+          
       - name: Deploy Staging
         run: |
           kubectl apply -f k8s/staging/deployment.yaml
@@ -81,13 +78,10 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Login no Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-      - name: Obter credenciais do AKS
-        run: az aks get-credentials --resource-group devops-rg --name security-cluster --overwrite-existing      
+      - name: Configurar kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > $HOME/.kube/config
 
       - name: Deploy Produção
         run: |
