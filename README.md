@@ -1,75 +1,139 @@
+
 # FIAP Security System API
 
-## Overview
+## Visão Geral
 
-The FIAP Security System API provides a set of endpoints to manage employees, handle user authentication, and report security incidents. The API is intended for use in security systems where incidents need to be logged, users managed, and role-based access is enforced.
+A FIAP Security System API fornece um conjunto de endpoints para gerenciar funcionários, lidar com autenticação de usuários e registrar incidentes de segurança. A API é destinada a sistemas de segurança onde é necessário registrar ocorrências, gerenciar usuários e aplicar controle de acesso baseado em funções.
 
-## Features
+## Funcionalidades
 
-- **Employee Management**: Create, update, and retrieve employee records.
-- **User Authentication**: Register new users and handle login sessions.
-- **Incident Management**: Create, update, delete, and retrieve security incidents.
+- **Gerenciamento de Funcionários**: Criar, atualizar e buscar registros de funcionários.
+- **Autenticação de Usuários**: Registrar novos usuários e gerenciar sessões de login.
+- **Gerenciamento de Ocorrências**: Criar, atualizar, deletar e buscar incidentes de segurança.
 
 ## API Endpoints
 
-### 1. Employee Management
+### 1. Gerenciamento de Funcionários
 
-- **Create User**: `POST /api/employees`
-  - Adds a new employee to the system.
-- **Get All Users**: `GET /api/employees`
-  - Retrieves all employee records.
-- **Get Employee by ID**: `GET /api/employees/{id}`
-  - Retrieves the details of a specific employee.
-- **Get Employees by Role**: `GET /api/employees/role/{role}`
-  - Retrieves employees based on their role.
+- **Criar Funcionário**: `POST /api/employees`
+  - Adiciona um novo funcionário ao sistema.
+- **Listar Todos os Funcionários**: `GET /api/employees`
+  - Recupera todos os registros de funcionários.
+- **Buscar Funcionário por ID**: `GET /api/employees/{id}`
+  - Retorna os detalhes de um funcionário específico.
+- **Buscar Funcionários por Função**: `GET /api/employees/role/{role}`
+  - Lista funcionários com base no cargo ou função.
 
-### 2. Authentication
+### 2. Autenticação
 
-- **Register**: `POST /api/auth/register`
-  - Registers a new user in the system.
+- **Registro**: `POST /api/auth/register`
+  - Registra um novo usuário no sistema.
 - **Login**: `POST /api/auth/login`
-  - Authenticates an existing user and provides a token.
+  - Autentica um usuário existente e retorna um token.
 
-### 3. Incident Management
+### 3. Gerenciamento de Ocorrências
 
-- **Get All Incidents**: `GET /api/incidents`
-  - Retrieves all reported incidents.
-- **Create Incident**: `POST /api/incidents`
-  - Reports a new incident.
-- **Get Incident by ID**: `GET /api/incidents/{id}`
-  - Retrieves a specific incident by its ID.
-- **Get Incidents by Status**: `GET /api/incidents/status/{status}`
-  - Retrieves incidents filtered by their status.
-- **Update Incident Status**: `PATCH /api/incidents/{id}/status`
-  - Updates the status of a specific incident.
-- **Delete Incident**: `DELETE /api/incidents/{id}`
-  - Deletes a specific incident from the system.
+- **Listar Ocorrências**: `GET /api/incidents`
+  - Lista todas as ocorrências registradas.
+- **Criar Ocorrência**: `POST /api/incidents`
+  - Registra uma nova ocorrência.
+- **Buscar Ocorrência por ID**: `GET /api/incidents/{id}`
+  - Retorna os detalhes de uma ocorrência específica.
+- **Buscar Ocorrências por Status**: `GET /api/incidents/status/{status}`
+  - Lista ocorrências filtradas por status.
+- **Atualizar Status da Ocorrência**: `PATCH /api/incidents/{id}/status`
+  - Atualiza o status de uma ocorrência.
+- **Deletar Ocorrência**: `DELETE /api/incidents/{id}`
+  - Remove uma ocorrência do sistema.
 
 ## Getting Started
 
 ### Prerequisites
 
-- **Java 11+**: The backend is built using Java, requiring version 11 or later.
-- **Docker**: Used for containerization and easy deployment.
+- **Java 21**: The backend is built using Java 21.
+- **Docker**: Used for containerization and deployment.
+- **kubectl**: For interacting with Kubernetes cluster (AKS).
+- **Azure CLI** (opcional): Para gestão do cluster se necessário.
 
-### Running the API
+### Running the API (Staging)
 
-1. Clone the repository.
-2. Ensure Docker is installed and running.
-3. Use Docker Compose to build and start the application:
-   ```bash
-   docker-compose up --build
-   ```
-4. The API will be available at `http://localhost:8080`.
+1. Criar o namespace staging:
+```bash
+kubectl create namespace staging
+```
 
-## Usage
+2. Aplicar as secrets e serviços do banco Oracle:
+```bash
+kubectl apply -f k8s/oracle/secrets.yaml -n staging
+kubectl apply -f k8s/oracle/service.yaml -n staging
+kubectl apply -f k8s/oracle/statefulset.yaml -n staging
+```
 
-You can use Postman to interact with the endpoints. A collection (`FIAP.postman_collection.json`) is provided for easy testing. Import it into Postman and run the requests directly.
+3. Aguardar até o pod `oracle-xe-0` ficar com STATUS `Running`
 
-## Technologies Used
+4. Aplicar os deployments da aplicacao:
+```bash
+kubectl apply -f k8s/staging/configmap.yaml -n staging
+kubectl apply -f k8s/staging/service.yaml -n staging
+kubectl apply -f k8s/staging/deployment.yaml -n staging
+```
 
-- **Spring Boot**: For developing the REST API.
-- **PostgreSQL**: As the primary database for storing user and incident data.
-- **Docker**: For containerization.
-- **Postman**: To test and document API endpoints.
+5. Obter o IP externo:
+```bash
+kubectl get svc -n staging
+```
+
+6. Testar a API com o Postman usando o IP externo
+
+### Running the API (Production)
+
+1. Criar o namespace production:
+```bash
+kubectl create namespace production
+```
+
+2. Aplicar a secret com credenciais do Oracle:
+```bash
+kubectl apply -f k8s/production/oracle-secret.yaml -n production
+```
+
+3. Aplicar o configmap da aplicacao:
+```bash
+kubectl apply -f k8s/production/configmap.yaml -n production
+```
+
+4. Aplicar os manifests:
+```bash
+kubectl apply -f k8s/production/service.yaml -n production
+kubectl apply -f k8s/production/deployment.yaml -n production
+```
+
+5. Obter o IP externo para testar com o Postman:
+```bash
+kubectl get svc -n production
+```
+
+## CI/CD com GitHub Actions
+
+Pipeline com 3 jobs:
+
+### `build_test_and_push`
+- Checkout do repo
+- Configura JDK 21 com Temurin
+- Compila projeto, roda testes
+- Cria imagem Docker (`latest`, `staging`) e faz push pro Docker Hub
+
+### `deploy_staging`
+- Aplica kubeconfig do Secret
+- Faz deploy no AKS namespace `staging`
+- Aplica `deployment.yaml` e `service.yaml`
+
+### `deploy_production`
+- Aplica kubeconfig e faz deploy no namespace `production`
+
+## Orquestração e Containerização
+
+- Docker utilizado para empacotar a aplicacao.
+- AKS gerencia os pods, services, secrets, configmaps e banco Oracle.
+- Ambiente separado: `staging` para testes, `production` para uso real.
 
