@@ -4,7 +4,7 @@ metadata:
   name: security-system-config
   namespace: production
 data:
-  SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle.production.svc.cluster.local:1521/XEPDB1
+  SPRING_DATASOURCE_URL: jdbc:oracle:thin:@//oracle.staging.svc.cluster.local:1521/XEPDB1
   application.properties: |
     spring.jpa.database-platform=org.hibernate.dialect.OracleDialect
     spring.jpa.show-sql=true

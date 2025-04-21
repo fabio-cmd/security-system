@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: fabiodinizdev/security-system:staging .
+          image: fabiodinizdev/security-system:staging 
           ports:
             - containerPort: 8080
           env:
